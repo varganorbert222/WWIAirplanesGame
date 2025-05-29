@@ -1,14 +1,23 @@
 import { MeshBuilder, StandardMaterial, Texture } from "@babylonjs/core";
 import terrainHeightmap from "../assets/terrains/terrain_heightmap.png";
 import terrainColormap from "../assets/terrains/terrain_colormap.png";
-import Singleton from "./singleton";
+import TerrainManagerConfig from "./interfaces/terrain-manager-config.interface";
+import Singleton from "./decorators/singleton.decorator";
 
-export default class TerrainManager extends Singleton {
+@Singleton
+export default class TerrainManager {
+  private readonly config: TerrainManagerConfig;
+
+  constructor(config: TerrainManagerConfig) {
+    this.config = config || {};
+  }
+
   createTerrain(): void {
-    const config = this.getConfig();
-
-    const groundMaterial = new StandardMaterial("ground", config.scene);
-    groundMaterial.diffuseTexture = new Texture(terrainColormap, config.scene);
+    const groundMaterial = new StandardMaterial("ground", this.config.scene);
+    groundMaterial.diffuseTexture = new Texture(
+      terrainColormap,
+      this.config.scene
+    );
 
     const ground = MeshBuilder.CreateGroundFromHeightMap(
       "gdhm",

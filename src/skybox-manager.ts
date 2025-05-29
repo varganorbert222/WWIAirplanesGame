@@ -5,22 +5,26 @@ import nz from "../assets/skyboxes/skybox_nz.jpg";
 import px from "../assets/skyboxes/skybox_px.jpg";
 import py from "../assets/skyboxes/skybox_py.jpg";
 import pz from "../assets/skyboxes/skybox_pz.jpg";
-import { Singleton } from "./singleton";
-import { SkyboxManagerConfig } from "./interfaces/skybox-manager.config.interface";
+import SkyboxManagerConfig from "./interfaces/skybox-manager.config.interface";
+import Singleton from "./decorators/singleton.decorator";
 
-export default class SkyBoxManager extends Singleton<SkyBoxManager> {
+@Singleton
+export default class SkyBoxManager {
+  private readonly config: SkyboxManagerConfig;
   private readonly skyboxFiles: string[] = [px, py, pz, nx, ny, nz];
 
   constructor(config: SkyboxManagerConfig) {
-    super(config);
+    this.config = config || {};
   }
 
   createSkybox(): CubeTexture {
-    const config = this.getConfig();
-
-    const texture = new CubeTexture("assets/skyboxes/skybox", config.scene, {
-      files: this.skyboxFiles,
-    });
+    const texture = new CubeTexture(
+      "assets/skyboxes/skybox",
+      this.config.scene,
+      {
+        files: this.skyboxFiles,
+      }
+    );
 
     return texture;
   }

@@ -1,35 +1,38 @@
 import { MeshBuilder, Scene } from "@babylonjs/core";
-import { SkyBoxManager } from "./skybox-manager";
-import { CameraManager } from "./camera-manager";
-import { SunManager } from "./sun-manager";
-import { SceneManagerConfig } from "./interfaces/scene-manager-config.interface";
-import { CameraManagerConfig } from "./interfaces/camera-manager-config.interface";
+import SkyBoxManager from "./skybox-manager";
+import SunManager from "./sun-manager";
+import SceneManagerConfig from "./interfaces/scene-manager-config.interface";
+import Singleton from "./decorators/singleton.decorator";
 
-export default class SceneManager extends Singleton<SceneManager> {
+@Singleton
+export default class SceneManager {
+  private readonly config: SceneManagerConfig;
+
   constructor(config: SceneManagerConfig) {
-    super(config);
+    this.config = config || {};
   }
 
-  createScene = () => {
-    const config = this.getConfig();
-    const scene: Scene = new Scene(config.engine);
+  createScene(): Scene {
+    const scene: Scene = new Scene(this.config.engine);
 
-    const skyboxManager = SkyBoxManager.getInstance();
-
-    const cameraManager = CameraManager.getInstance<CameraManagerConfig>({
-      canvas: config.canvas,
+    const skyboxManager = new SkyBoxManager({
       scene: scene,
     });
 
-    const sunManager = SunManager.getInstance({
+    const sunManager = new SunManager({
       scene: scene,
     });
 
     const sun = sunManager.createSun();
-    const skybox = skyboxManager.getSkybox();
+    const skybox = skyboxManager.createSkybox();
 
     scene.createDefaultSkybox(skybox, true, 1000);
+    this.createObjects(scene);
 
+    return scene;
+  }
+
+  private createObjects(scene: Scene): void {
     const sphere = MeshBuilder.CreateSphere(
       "sphere",
       { diameter: 2, segments: 32 },
@@ -43,7 +46,5 @@ export default class SceneManager extends Singleton<SceneManager> {
       { width: 6, height: 6 },
       scene
     );
-
-    return scene;
-  };
+  }
 }

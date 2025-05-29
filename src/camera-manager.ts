@@ -1,39 +1,49 @@
-import { Camera, FollowCamera, FreeCamera, Vector3 } from "@babylonjs/core";
+import {
+  ArcRotateCamera,
+  Camera,
+  FollowCamera,
+  FreeCamera,
+  Vector3,
+} from "@babylonjs/core";
 import { CameraMode } from "./enums/camera-mode.enum";
-import Singleton from "./singleton";
-import Config from "./interfaces/config.interface";
 import CameraManagerConfig from "./interfaces/camera-manager-config.interface";
+import Singleton from "./decorators/singleton.decorator";
 
-export default class CameraManager
-  extends Singleton
-  implements Config<CameraManagerConfig>
-{
-  private camera?: Camera;
-  private freeCamera?: FreeCamera;
-  private followCamera?: FollowCamera;
+@Singleton
+export default class CameraManager {
+  private readonly config: CameraManagerConfig;
+  private readonly camera: Camera;
+  private readonly freeCamera: FreeCamera;
+  private readonly followCamera: FollowCamera;
+  private readonly orbitalCamera: ArcRotateCamera;
   private currentCamera?: Camera;
-  private config?: CameraManagerConfig;
 
-  getConfig(): CameraManagerConfig {
-    return this.config;
-  }
+  constructor(config: CameraManagerConfig) {
+    this.config = config || {};
 
-  init(config: CameraManagerConfig): void {
-    const scene = config.scene;
-
-    this.camera = new Camera("camera", Vector3.Zero(), scene);
+    this.camera = new Camera("camera", Vector3.Zero(), this.config.scene);
 
     this.freeCamera = new FreeCamera(
       "freeCamera",
       new Vector3(0, 5, -10),
-      scene
+      this.config.scene
     );
     this.freeCamera.setTarget(Vector3.Zero());
 
     this.followCamera = new FollowCamera(
       "followCamera",
       new Vector3(0, 5, -10),
-      scene
+      this.config.scene
+    );
+    this.followCamera.setTarget(Vector3.Zero());
+
+    this.orbitalCamera = new ArcRotateCamera(
+      "orbitalCamera",
+      Math.PI / 2,
+      Math.PI / 4,
+      10,
+      Vector3.Zero(),
+      this.config.scene
     );
   }
 
@@ -41,31 +51,35 @@ export default class CameraManager
     return this.camera;
   }
 
-  getFreeCamera(): FreeCamera | undefined {
+  getFreeCamera(): FreeCamera {
     return this.freeCamera;
   }
 
-  getFollowCamera(): FollowCamera | undefined {
+  getFollowCamera(): FollowCamera {
     return this.followCamera;
   }
 
-  switchCamera(mode: CameraMode): void {
-    const config = this.getConfig();
-    const canvas = config.canvas;
-
-    this.currentCamera?.detachControl(canvas);
+  switchCamera(mode: CameraMode): Camera | undefined {
+    this.currentCamera?.detachControl(this.config.canvas);
 
     if (mode === CameraMode.FREE) {
-      this.freeCamera?.attachControl(canvas, true);
+      this.freeCamera.attachControl(this.config.canvas, true);
       this.currentCamera = this.freeCamera;
     } else if (mode === CameraMode.FOLLOW) {
-      this.followCamera?.attachControl(true);
+      this.followCamera.attachControl(true);
       this.currentCamera = this.followCamera;
     } else if (mode === CameraMode.FIXED) {
-      this.camera?.attachControl(canvas, true);
+      this.camera.attachControl(this.config.canvas, true);
       this.currentCamera = this.camera;
     } else if (mode === CameraMode.ORBITAL) {
-      // TODO: még hiányzik az orbitális kamera
+      this.orbitalCamera.attachControl(this.config.canvas, true);
+      this.currentCamera = this.orbitalCamera;
     }
+
+    if (this.currentCamera) {
+      this.config.scene.activeCamera = this.currentCamera;
+    }
+
+    return this.currentCamera;
   }
 }

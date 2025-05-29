@@ -2,27 +2,37 @@ import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
 import "@babylonjs/loaders/glTF";
 import { Engine } from "@babylonjs/core";
-import { SceneManager } from "./scene-manager";
-import { SceneManagerConfig } from "./interfaces/scene-manager-config.interface";
+import SceneManager from "./scene-manager";
+import CameraManager from "./camera-manager";
+import { CameraMode } from "./enums/camera-mode.enum";
 
-export default class Game {
-  private antialias: boolean = false;
+class Game {
+  private antialias: boolean = true;
 
   constructor() {
     this.initialize();
   }
 
-  initialize() {
-    console.log("Game initialized");
+  private initialize() {
+    console.log("Initializing game...");
 
     const canvas: HTMLCanvasElement = document.getElementById(
       "renderCanvas"
     ) as HTMLCanvasElement;
+
     const engine = new Engine(canvas, this.antialias);
-    const scene = SceneManager.getInstance({
+
+    const scene = new SceneManager({
       canvas: canvas,
       engine: engine,
     }).createScene();
+
+    const cameraManager = new CameraManager({
+      canvas: canvas,
+      scene: scene,
+    });
+
+    const camera = cameraManager.switchCamera(CameraMode.ORBITAL);
 
     engine.runRenderLoop(function () {
       scene.render();
@@ -31,6 +41,8 @@ export default class Game {
     window.addEventListener("resize", function () {
       engine.resize();
     });
+
+    console.log("Game successfully initialized.");
   }
 }
 
