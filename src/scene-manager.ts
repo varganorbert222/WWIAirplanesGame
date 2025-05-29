@@ -3,6 +3,7 @@ import SkyBoxManager from "./skybox-manager";
 import SunManager from "./sun-manager";
 import SceneManagerConfig from "./interfaces/scene-manager-config.interface";
 import Singleton from "./decorators/singleton.decorator";
+import TerrainManager from "./terrain-manager";
 
 @Singleton
 export default class SceneManager {
@@ -33,18 +34,20 @@ export default class SceneManager {
   }
 
   private createObjects(scene: Scene): void {
-    const sphere = MeshBuilder.CreateSphere(
-      "sphere",
-      { diameter: 2, segments: 32 },
-      scene
-    );
+    // const sphere = MeshBuilder.CreateSphere(
+    //   "sphere",
+    //   { diameter: 2, segments: 32 },
+    //   scene
+    // );
+    // sphere.position.y = 1;
+    // const ground = MeshBuilder.CreateGround(
+    //   "ground",
+    //   { width: 6, height: 6 },
+    //   scene
+    // );
 
-    sphere.position.y = 1;
-
-    const ground = MeshBuilder.CreateGround(
-      "ground",
-      { width: 6, height: 6 },
-      scene
-    );
+    const terrain = new TerrainManager({
+      scene: scene,
+    }).createTerrain();
   }
 }

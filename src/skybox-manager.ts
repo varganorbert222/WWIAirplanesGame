@@ -1,17 +1,12 @@
 import { CubeTexture } from "@babylonjs/core";
-import nx from "../assets/skyboxes/skybox_nx.jpg";
-import ny from "../assets/skyboxes/skybox_ny.jpg";
-import nz from "../assets/skyboxes/skybox_nz.jpg";
-import px from "../assets/skyboxes/skybox_px.jpg";
-import py from "../assets/skyboxes/skybox_py.jpg";
-import pz from "../assets/skyboxes/skybox_pz.jpg";
 import SkyboxManagerConfig from "./interfaces/skybox-manager.config.interface";
 import Singleton from "./decorators/singleton.decorator";
+import { cloudsSkyboxData } from "./data/clouds-skybox.data";
 
 @Singleton
 export default class SkyBoxManager {
   private readonly config: SkyboxManagerConfig;
-  private readonly skyboxFiles: string[] = [px, py, pz, nx, ny, nz];
+  private readonly skyboxFiles: string[] = [...Object.values(cloudsSkyboxData)];
 
   constructor(config: SkyboxManagerConfig) {
     this.config = config || {};

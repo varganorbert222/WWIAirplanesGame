@@ -1,8 +1,12 @@
-import { MeshBuilder, StandardMaterial, Texture } from "@babylonjs/core";
-import terrainHeightmap from "../assets/terrains/terrain_heightmap.png";
-import terrainColormap from "../assets/terrains/terrain_colormap.png";
+import {
+  GroundMesh,
+  MeshBuilder,
+  StandardMaterial,
+  Texture,
+} from "@babylonjs/core";
 import TerrainManagerConfig from "./interfaces/terrain-manager-config.interface";
 import Singleton from "./decorators/singleton.decorator";
+import { valleyTerrainData } from "./data/valley-terrain.data";
 
 @Singleton
 export default class TerrainManager {
@@ -12,25 +16,49 @@ export default class TerrainManager {
     this.config = config || {};
   }
 
-  createTerrain(): void {
-    const groundMaterial = new StandardMaterial("ground", this.config.scene);
-    groundMaterial.diffuseTexture = new Texture(
-      terrainColormap,
+  createTerrain(): GroundMesh {
+    const terrainData = valleyTerrainData;
+
+    //Create Village ground
+    const groundMat = new StandardMaterial("groundMat");
+    groundMat.diffuseTexture = new Texture(
+      terrainData.villagegreen,
       this.config.scene
     );
+    groundMat.diffuseTexture.hasAlpha = true;
 
-    const ground = MeshBuilder.CreateGroundFromHeightMap(
-      "gdhm",
-      terrainHeightmap,
+    const ground = MeshBuilder.CreateGround(
+      "ground",
       {
-        width: 1024,
-        height: 1024,
-        subdivisions: 1024,
-        maxHeight: 200,
-        minHeight: 0,
-      }
+        width: 24,
+        height: 24,
+        subdivisions: 2,
+      },
+      this.config.scene
     );
+    ground.material = groundMat;
 
-    ground.material = groundMaterial;
+    //large ground
+    const largeGroundMat = new StandardMaterial("largeGroundMat");
+    largeGroundMat.diffuseTexture = new Texture(terrainData.valleygrass);
+
+    const largeGround = MeshBuilder.CreateGroundFromHeightMap(
+      "largeGround",
+      terrainData.villageheightmap,
+      {
+        width: 150,
+        height: 150,
+        subdivisions: 20,
+        minHeight: 0,
+        maxHeight: 10,
+      },
+      this.config.scene
+    );
+    largeGround.material = largeGroundMat;
+    largeGround.position.y = -0.01;
+
+    ground.material = groundMat;
+
+    return ground;
   }
 }

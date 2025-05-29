@@ -45,6 +45,16 @@ export default class CameraManager {
       Vector3.Zero(),
       this.config.scene
     );
+
+    this.setClippingPlanes(this.camera);
+    this.setClippingPlanes(this.freeCamera);
+    this.setClippingPlanes(this.followCamera);
+    this.setClippingPlanes(this.orbitalCamera);
+  }
+
+  private setClippingPlanes(camera: Camera): void {
+    camera.minZ = 0.1; // Minimum distance from the camera to the object
+    camera.maxZ = 10000; // Maximum distance from the camera to the object
   }
 
   getCamera(): Camera | undefined {
