@@ -41,6 +41,8 @@ class Game {
     const cameraManager = new CameraManager({
       canvas: canvas,
       scene: scene,
+      minZ: 0.01,
+      maxZ: 10000.0,
     });
 
     const camera = cameraManager.switchCamera(CameraMode.ORBITAL);

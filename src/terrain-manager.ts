@@ -1,4 +1,5 @@
 import {
+  Color3,
   GroundMesh,
   MeshBuilder,
   StandardMaterial,
@@ -19,6 +20,11 @@ export default class TerrainManager {
   createTerrain(): GroundMesh {
     const terrainData = valleyTerrainData;
 
+    const setupMaterial = (material: StandardMaterial) => {
+      material.specularColor = new Color3(0.5, 0.5, 0.5);
+      material.specularPower = 64;
+    };
+
     //Create Village ground
     const groundMat = new StandardMaterial("groundMat");
     groundMat.diffuseTexture = new Texture(
@@ -26,6 +32,7 @@ export default class TerrainManager {
       this.config.scene
     );
     groundMat.diffuseTexture.hasAlpha = true;
+    setupMaterial(groundMat);
 
     const ground = MeshBuilder.CreateGround(
       "ground",
@@ -40,7 +47,11 @@ export default class TerrainManager {
 
     //large ground
     const largeGroundMat = new StandardMaterial("largeGroundMat");
-    largeGroundMat.diffuseTexture = new Texture(terrainData.valleygrass);
+    largeGroundMat.diffuseTexture = new Texture(
+      terrainData.valleygrass,
+      this.config.scene
+    );
+    setupMaterial(largeGroundMat);
 
     const largeGround = MeshBuilder.CreateGroundFromHeightMap(
       "largeGround",
@@ -48,7 +59,7 @@ export default class TerrainManager {
       {
         width: 150,
         height: 150,
-        subdivisions: 20,
+        subdivisions: 512,
         minHeight: 0,
         maxHeight: 10,
       },
