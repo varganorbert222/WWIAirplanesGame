@@ -1,10 +1,9 @@
-import { Engine } from "@babylonjs/core";
+import { Scene } from "@babylonjs/core";
 import AmbientConfig from "./ambient-config.interface";
 import FogConfig from "./fog-config.interface";
 
-export default interface SceneManagerConfig {
-  engine: Engine;
-  canvas: HTMLCanvasElement;
+export default interface EnvironmentManagerConfig {
+  scene: Scene;
   ambientConfig: AmbientConfig;
   fogConfig: FogConfig;
 }

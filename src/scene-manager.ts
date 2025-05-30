@@ -1,9 +1,8 @@
-import { MeshBuilder, Scene } from "@babylonjs/core";
-import SkyBoxManager from "./skybox-manager";
-import SunManager from "./sun-manager";
+import { Scene } from "@babylonjs/core";
 import SceneManagerConfig from "./interfaces/scene-manager-config.interface";
 import Singleton from "./decorators/singleton.decorator";
 import TerrainManager from "./terrain-manager";
+import EnvironmentManager from "./environment-manager";
 
 @Singleton
 export default class SceneManager {
@@ -15,37 +14,18 @@ export default class SceneManager {
 
   createScene(): Scene {
     const scene: Scene = new Scene(this.config.engine);
-
-    const skyboxManager = new SkyBoxManager({
+    const environmentManager = new EnvironmentManager({
       scene: scene,
-    });
+      ambientConfig: this.config.ambientConfig,
+      fogConfig: this.config.fogConfig,
+    }).createEnvironment();
 
-    const sunManager = new SunManager({
-      scene: scene,
-    });
-
-    const sun = sunManager.createSun();
-    const skybox = skyboxManager.createSkybox();
-
-    scene.createDefaultSkybox(skybox, true, 1000);
     this.createObjects(scene);
 
     return scene;
   }
 
   private createObjects(scene: Scene): void {
-    // const sphere = MeshBuilder.CreateSphere(
-    //   "sphere",
-    //   { diameter: 2, segments: 32 },
-    //   scene
-    // );
-    // sphere.position.y = 1;
-    // const ground = MeshBuilder.CreateGround(
-    //   "ground",
-    //   { width: 6, height: 6 },
-    //   scene
-    // );
-
     const terrain = new TerrainManager({
       scene: scene,
     }).createTerrain();
